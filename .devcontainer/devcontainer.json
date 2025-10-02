@@ -1,0 +1,62 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+  "name": "PaperInterpreter (Python 3.13 + MCP)",
+  // Python 3.13 系の公式 Dev Containers イメージ
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.13-bookworm",
+
+  // 追加ツール（Node は MCP/Playwright 用に 18+ を確保）
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  },
+
+  // VS Code 拡張 & 設定（リモート側）
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-azuretools.vscode-docker",
+        "yzhang.markdown-all-in-one",
+        "esbenp.prettier-vscode"
+      ],
+      // ★ MCP サーバを devcontainer 側に常駐登録
+      "mcp": {
+        "servers": {
+          "fetch": {
+            "command": "uvx",
+            "args": ["mcp-server-fetch"]
+          },
+          "playwright": {
+            "command": "npx",
+            "args": ["-y", "@playwright/mcp@latest",
+					"--allowed-hosts", "*"]
+          }
+        }
+      },
+      "settings": {
+        // Agent が MCP を使えるように（必要に応じて制限可能）
+        "chat.mcp.access": "all",
+        // Python 設定（お好みで）
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.analysis.typeCheckingMode": "basic",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  // 初回セットアップ（PDF処理系の依存と Playwright のブラウザ）
+  "postCreateCommand": "bash .devcontainer/setup.sh"
+
+  // 任意：よく使うポートがあれば
+  // "forwardPorts": [8888],
+
+  // root のままでOK（CI などで必要なら remoteUser を追加）
+  // "remoteUser": "vscode"
+}
