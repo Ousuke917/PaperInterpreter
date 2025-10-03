@@ -41,7 +41,8 @@
           "Interpreter": {
             "command": "python",
             "type": "stdio",
-            "args": ["InterpreterMCP.py"]
+            "args": ["/workspaces/PaperInterpreter/InterpreterMCP.py"]
+          }
         }
       },
       "settings": {
