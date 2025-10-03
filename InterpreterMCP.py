@@ -6,7 +6,7 @@ from tools.GoogleSearch import getSearchResponse
 mcp = FastMCP(name="Interpreter Assistant Server")
 
 
-@mcp.tool(name="PDF to Markdown Converter", description="Convert a PDF file to Markdown format, extracting text and images.")
+@mcp.tool(name="PDF_to_Markdown_Converter", description="Convert a PDF file to Markdown format, extracting text and images.")
 def pdf_to_markdown_tool(
     pdf_path: str,
     md_output_path: str = "output.md",
@@ -46,7 +46,7 @@ def pdf_to_markdown_tool(
     return md_results
 
 
-@mcp.tool(name="Google Search", description="Perform a Google search and return a list of URLs.")
+@mcp.tool(name="Google_Search", description="Perform a Google search and return a list of URLs.")
 def google_search_tool(
     keyword: str,
     DATA_DIR: str
@@ -73,78 +73,33 @@ def google_search_tool(
 @mcp.prompt(name="PDF to Markdown Conversion Prompt", description="Convert the provided PDF file to Markdown format, extracting text and images. Save the output to the specified path.")
 def MatSci_Interpreter_prompt(pdf_path: str) -> str:
 
-    prompt = f"""あなたは材料科学（Materials Science）の専門家チームを代表し、固体物理、結晶学、量子力学、グループ理論など周辺知見にも明るい大学教授ペルソナです。以下の条件で、与えられた論文 PDF（パス: {pdf_path}）に関して、
-利用者の知識レベルに合わせた分かりやすく具体的なreport（Markdown形式、ファイル名: report.md想定）を作成してください。
+    prompt = f"""あなたは材料科学や量子力学、群論、固体物理学、統計力学などの学問の最先端の知見を有する優秀な大学教授です。
+こちらの論文PDFファイル{pdf_path}について、以下の知識レベルをもつ学生にも理解できるように、具体的かつ分かりやすい丁寧な解説レポートを作成してください。
 
----
+### 学生の知識レベル
+- 材料科学、量子力学、群論、固体物理学、統計力学などに関する基礎的な知識は有しているが、専門的な内容については理解が浅い。
+- 大学院に入りたての学生
 
-### 出力形式と読者
+### レポートの要件
+- report.mdという名前のMarkdownファイルで出力してください。
+- 論文内に数式が登場した場合は、その数式をmarkdown形式で正確に記述して詳細な解説を加えてください。
+- 論文内に図が登場した場合は、その図を適切な場所に挿入し、図の説明を加えてください。
+- 論文の内容を要約するだけでなく、必要に応じて学生が理解しやすいように具体例や比喩を用いて説明してください。
+- 専門用語が登場した場合は、その用語の意味を簡潔に説明してください。
 
-- 出力は **Markdown 形式（report.md 想定）**  
-- YAML ヘッダ（title, authors, source_pdf, generated_by, audience, summary_length）を先頭に含める  
-- レポートは論文の内容を正確に反映しつつ、読者レベルに合わせた分かりやすい内容にすること
-- 読者層：大学院 1 年生レベル。材料科学や量子力学の基礎は理解しているが、専門外の分野に関しては初心者レベル。 
-
----
-
-### レポート構成（推奨セクション順）
-
-1. Title / Authors / Citation  
-2. TL;DR（3行）  
-3. 要点サマリー（箇条書き）  
-4-10. Interpreter mcp内のpdf_to_markdown_toolの出力 md_text の各セクション毎に、以下を含む詳細解説を順番に行う。  
-   - セクションタイトル  
-   - そのセクション内容を大学教授らしく、自身の担当生徒に具体的にかつ分かりやすく説明するように解説
-   - 解説における重要なポイントには必ず引用元（ページ番号）を明記  
-   - 数式は可能な限り `$...$` / `$$...$$` 形式で再現  
-   - 解説内では図をしっかりと表示すること。図は `![](相対パス)` で Markdown に埋め込み。この際に見やすさなども考慮して図の配置を最適化すること。
-   - 誤解を招く記述は避け、不確かさには明記（「〜と思われる」など）    
-   - 節ごとに見直しを行い、統一語彙・表記・単位で整える  
-   - 必要に応じて元 PDF を参照し、数式・表などがうまく変換されていない場合に補完する  
-11. 推奨アクション  
-12. 参考文献  
-13. Appendix：元 Markdown 抜粋、図ファイル一覧（相対パス）
-
----
-
-### 動作戦略（Agent に期待するツール利用手順）
-
-1. **PDF → Markdown 変換**  
-   - 最初にInterpreter mcp内のpdf_to_markdown_toolを呼び出す  
-   - その出力 `md_text` を読み込む  
-   - ただし数式・表などがうまく変換されていない可能性を念頭に置き、必要に応じて元 PDF を参照する。
-   - 最終出力は `md_text` と同じくらいもしくはそれ以上の文量で出力されることを想定。  
-
-2. **検索経由情報の取得**  
-   - 原著だけで情報が足りないと判断したとき、Interpreter mcp内の google_search_tool を呼び出す
-   - この際に必要となる入力変数の'DATA_DIR'は `pdf_to_markdown_tool` の出力 `dest_dir` を利用する。
-   - この検索ツールは **URL リスト**を返すもの。 
-
-3. **取得 URL の内容取得**  
-   - 検索で得た URL に対して、**#fetch**（静的ページ）または **#playwright**（動的ページ）を使って本文または関連データを取得  
-   - 取得後、要点を抜き出してレポート内容に統合  
-
-4. **情報統合と最終出力**  
-   - PDF 由来内容と検索由来内容を混ぜて、レポート構成に従いまとめる  
-   - report.mdは `tools.PDFTools.pdf_to_markdown()` の出力 `dest_dir` に保存する。
-
-5. **探索制御ルール**  
-   - 検索回数やフェッチ数には上限を設ける（例：検索は最大 5 回、URL フェッチは上位 10 件まで）  
-   - 同一 URL の重複フェッチを避ける  
-   - 情報が十分と判断したら無理に検索を続けず停止  
-
----
-
-### 品質チェック &注意点
-
-- 専門用語には定義を必ず添える  
-- データ・式・グラフには常に出典を付ける  
-- 誤解を招く記述は避け、不確かさには明記（「〜と思われる」など）  
-- コードや計算モデルが論文にあれば簡易検算や説明を添える  
-- 節ごとに見直しを行い、統一語彙・表記・単位で整える  
-
----
-
+### 作成順序
+1. 与えられたPDFファイルを読み込み、その内容をできる限り正確に理解する。
+2.  InterpreterMCP の pdf_to_markdown_tool を使用して、PDFファイルをMarkdown形式に変換し、テキストと画像を抽出する。
+    - ただし、こちらで出力されるテキストの方には、数式や画像の情報が欠落している可能性が高いので、こちらは図などの画像だデータを取り出すための用途に留めること。
+    - こちらのツールを実行すると、md_textとdest_dirが得られる。md_textは変換されたMarkdownの文字列、dest_dirは元のPDFを移動した先のディレクトリのパスである。
+    - 抽出画像もdest_dir内のmaterialsというディレクトリに保存される。
+3. 1番の手順で理解した内容をもとに、学生の知識レベルに合わせた解説レポートを作成する。
+    - レポート内で論文と同じ図を使用する場合は、pdf_to_markdown_toolで抽出した画像を適切な場所に挿入する。
+    - 画像を挿入する際はreport.mdからの相対パスを指定しないと画像が表示されないので注意すること。
+    - レポートを作成する上で追加情報が必要であると判断した場合は、google_search_toolを使用して関連urlを収集し、それらのurlに fetch mcp や
+    playwright mcpなどのツールを使って内容を取得し、レポートに反映させること。
+4. 内容の正確性と分かりやすさを確認し、必要に応じて修正を加える。
+5. レポートをreport.mdという名前のMarkdownファイルでdest_dir内に保存する。
 
 """
 
