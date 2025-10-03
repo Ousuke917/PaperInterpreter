@@ -100,3 +100,7 @@ def MatSci_Interpreter_prompt(pdf_path: str) -> str:
 """
 
     return prompt
+
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")  # Default, so transport argument is optional
