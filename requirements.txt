@@ -4,3 +4,4 @@ pillow
 uv
 google-api-python-client
 python-dotenv
+fastmcp
