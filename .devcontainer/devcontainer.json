@@ -24,6 +24,9 @@
         "ms-toolsai.jupyter",
         "ms-azuretools.vscode-docker",
         "yzhang.markdown-all-in-one",
+        "marp-team.marp-vscode",
+        "shd101wyy.markdown-preview-enhanced",
+        "yzane.markdown-pdf",
         "esbenp.prettier-vscode"
       ],
       // ★ MCP サーバを devcontainer 側に常駐登録
