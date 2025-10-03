@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict, Any
 
 import pymupdf  # PyMuPDF
 import pymupdf4llm
@@ -49,7 +49,7 @@ def pdf_to_markdown(
     image_format: str = "png",
     page_chunks: bool = False,
     **kwargs,
-) -> str:
+) -> Dict[str, Any]:
     """
     Convert a PDF to Markdown using pymupdf4llm and save it.
 
@@ -69,70 +69,72 @@ def pdf_to_markdown(
     # 入力パスを Path に統一
     src_pdf = Path(pdf_path)
     doc = pymupdf.open(str(src_pdf))
-    title = doc.metadata.get("title", "")
-    if title:
-        print(f"Converting PDF '{title}' to Markdown...")
+    title = doc.metadata.get("title") or ""
+    if not title.strip():
+        # タイトルが無い場合は PDF ファイル名 (拡張子除く) を安全化して利用
+        title = Path(pdf_path).stem
+    print(f"Converting PDF '{title}' to Markdown...")
 
-        # タイトル名のディレクトリを作成して元PDFを移動
-        safe_title = _sanitize_filename(title)
-        dest_dir = src_pdf.parent / safe_title
-        _ensure_dir(dest_dir)
-        dest_pdf = dest_dir / src_pdf.name
+    # タイトル名（あるいはファイル名）ディレクトリを作成して元PDFを移動
+    safe_title = _sanitize_filename(title)
+    dest_dir = src_pdf.parent / safe_title
+    _ensure_dir(dest_dir)
+    dest_pdf = dest_dir / src_pdf.name
+    try:
+        # 既に移動済みでなければ移動する
+        if src_pdf.resolve() != dest_pdf.resolve():
+            shutil.move(str(src_pdf), str(dest_pdf))
+            print(f"Moved PDF to '{dest_pdf}'")
+            # 以降の処理は移動先のパスを使う
+            src_pdf = dest_pdf
+    except Exception as e:
+        print(f"Warning: failed to move PDF into title directory: {e}")
+
+    # 画像出力ディレクトリ
+    if write_images and image_dir:
+        image_dir = os.path.join(dest_dir, image_dir)
+
+    md_text: str = pymupdf4llm.to_markdown(
+        str(src_pdf),
+        page_chunks=page_chunks,
+        write_images=write_images,
+        image_path=str(image_dir),
+        image_format=image_format,
+        dpi=1200,
+        **kwargs,
+    )
+
+    # 出力先 md の絶対パスを決定
+    md_output_path = os.path.join(dest_dir, md_output_path)
+    md_path = Path(md_output_path)
+    _ensure_dir(md_path.parent)
+
+    # Markdown 内の画像パスが絶対パスになっている場合、md から見た相対パスに置換する
+    if image_dir:
         try:
-            # 既に移動済みでなければ移動する
-            if src_pdf.resolve() != dest_pdf.resolve():
-                shutil.move(str(src_pdf), str(dest_pdf))
-                print(f"Moved PDF to '{dest_pdf}'")
-                # 以降の処理は移動先のパスを使う
-                src_pdf = dest_pdf
-        except Exception as e:
-            print(f"Warning: failed to move PDF into title directory: {e}")
+            image_dir_path = Path(image_dir)
+            md_parent = md_path.parent
+            # 相対パスを計算（Posix 形式）
+            rel = os.path.relpath(
+                str(image_dir_path), start=str(md_parent))
+            rel_posix = Path(rel).as_posix()
+            if not (rel_posix.startswith(".") or rel_posix.startswith("/")):
+                rel_posix = "./" + rel_posix
 
-        # 画像出力ディレクトリ
-        if write_images and image_dir:
-            image_dir = os.path.join(dest_dir, image_dir)
-
-        md_text: str = pymupdf4llm.to_markdown(
-            str(src_pdf),
-            page_chunks=page_chunks,
-            write_images=write_images,
-            image_path=str(image_dir),
-            image_format=image_format,
-            dpi=1200,
-            **kwargs,
-        )
-
-        # 出力先 md の絶対パスを決定
-        md_output_path = os.path.join(dest_dir, md_output_path)
-        md_path = Path(md_output_path)
-        _ensure_dir(md_path.parent)
-
-        # Markdown 内の画像パスが絶対パスになっている場合、md から見た相対パスに置換する
-        if image_dir:
+            # 置換対象として絶対パス／解決済みパスを収集して置換
+            abs_candidates = {image_dir_path.as_posix()}
             try:
-                image_dir_path = Path(image_dir)
-                md_parent = md_path.parent
-                # 相対パスを計算（Posix 形式）
-                rel = os.path.relpath(
-                    str(image_dir_path), start=str(md_parent))
-                rel_posix = Path(rel).as_posix()
-                if not (rel_posix.startswith(".") or rel_posix.startswith("/")):
-                    rel_posix = "./" + rel_posix
+                abs_candidates.add(image_dir_path.resolve().as_posix())
+            except Exception:
+                pass
+            for p in abs_candidates:
+                md_text = md_text.replace(p, rel_posix)
+        except Exception as e:
+            print(
+                f"Warning: failed to adjust image paths to relative: {e}")
 
-                # 置換対象として絶対パス／解決済みパスを収集して置換
-                abs_candidates = {image_dir_path.as_posix()}
-                try:
-                    abs_candidates.add(image_dir_path.resolve().as_posix())
-                except Exception:
-                    pass
-                for p in abs_candidates:
-                    md_text = md_text.replace(p, rel_posix)
-            except Exception as e:
-                print(
-                    f"Warning: failed to adjust image paths to relative: {e}")
-
-        md_path.write_text(md_text, encoding="utf-8")
-        return {"md_text": md_text, "dest_dir": str(dest_dir)}
+    md_path.write_text(md_text, encoding="utf-8")
+    return {"md_text": md_text, "dest_dir": str(dest_dir)}
 
 
 if __name__ == "__main__":
