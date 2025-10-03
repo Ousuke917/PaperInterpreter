@@ -37,7 +37,11 @@
             "command": "npx",
             "args": ["-y", "@playwright/mcp@latest",
 					"--allowed-hosts", "*"]
-          }
+          },
+          "Interpreter": {
+            "command": "python",
+            "type": "stdio",
+            "args": ["InterpreterMCP.py"]
         }
       },
       "settings": {
