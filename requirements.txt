@@ -1,0 +1,6 @@
+pymupdf
+pymupdf4llm
+pillow
+uv
+google-api-python-client
+python-dotenv
