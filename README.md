@@ -25,6 +25,8 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
 - github copilot agentと連携した際のシステムは以下のようになっております。
 - 現在はweb検索機能が不十分であります。将来的にはdeepresearchのような機能を追加して、より高度な解析を行えるようにする予定です。
 
+![]
+
 # 使い方（簡易）
 
 1. 依存をインストールして devcontainer を起動済みであることを確認してください（devcontainer の初期化は [.devcontainer/setup.sh](.devcontainer/setup.sh) が行います）。
