@@ -46,7 +46,7 @@
 - API キー等の設定は [.github/.env](../.github/.env) を参照していますが、実運用ではリポジトリに平文で置かないでください（詳細は [docs/Prepare.md](./Prepare.md) を参照）。  
 - 直接実行で問題が出る場合は、まず `python -c "import pymupdf; print(pymupdf.__version__)"` 等で依存が正しく入っているか確認します。
 
-参照ファイルとシンボル
+## 参照ファイルとシンボル
 - [InterpreterMCP.py](../InterpreterMCP.py) — [`InterpreterMCP.pdf_to_markdown_tool`](../InterpreterMCP.py), [`InterpreterMCP.MatSci_Interpreter_prompt`](../InterpreterMCP.py)  
 - [tools/PDFTools.py](../tools/PDFTools.py) — [`tools.PDFTools.pdf_to_markdown`](../tools/PDFTools.py)  
 - [tools/GoogleSearch.py](../tools/GoogleSearch.py) — [`tools.GoogleSearch.getSearchResponse`](../tools/GoogleSearch.py)  
