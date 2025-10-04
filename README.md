@@ -46,9 +46,13 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
    - 数式は KaTeX 形式で README 等に含められます。
    - 例: 
         ```text
-        $ \gamma = \dfrac{G(T,p,\{n_x\}) - \sum_x n_x \mu_x(T,p_x)}{A} $。
+        $ \gamma = \dfrac{G(T,p,\{n_x\}) - \sum_x n_x \mu_x(T,p_x)}{A} $
         ```
         ➡️ &emsp; <img src="./images/equition.png" alt="数式" width="300" />
+
+より詳細な使い方や事前準備については、それぞれ次のページにアクセスして確認してください。
+- 事前準備：[Prepare.md](./docs/Prepare.md)
+- 使い方詳細：[howtouse.md](./docs/howtouse.md)
 
 # 参照
 - 実装ファイル:
