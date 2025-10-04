@@ -9,11 +9,7 @@ mcp = FastMCP(name="Interpreter Assistant Server")
 @mcp.tool(name="PDF_to_Markdown_Converter", description="Convert a PDF file to Markdown format, extracting text and images.")
 def pdf_to_markdown_tool(
     pdf_path: str,
-    md_output_path: str = "output.md",
-    write_images: bool = True,
-    image_dir: str = 'materials',
-    image_format: str = "png",
-    page_chunks: bool = False,
+    md_output_path: str = "output.md"
 ) -> dict:
     """
     Convert a PDF file to Markdown format, extracting text and images.
@@ -36,11 +32,7 @@ def pdf_to_markdown_tool(
     # Call the imported pdf_to_markdown function (from tools.PDFTools) which was shadowed before.
     md_results = pdf_to_markdown(
         pdf_path=pdf_path,
-        md_output_path=md_output_path,
-        write_images=write_images,
-        image_dir=image_dir,
-        image_format=image_format,
-        page_chunks=page_chunks,
+        md_output_path=md_output_path
     )
 
     return md_results
