@@ -59,7 +59,6 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
   - [InterpreterMCP.py](InterpreterMCP.py)（MCP ツール定義・プロンプト）
   - [tools/PDFTools.py](tools/PDFTools.py)（[`tools.PDFTools.pdf_to_markdown`](tools/PDFTools.py) 実装）
   - [tools/GoogleSearch.py](tools/GoogleSearch.py)（[`tools.GoogleSearch.getSearchResponse`](tools/GoogleSearch.py) 実装）
-  - [PhysRevB_68_245409/report.md](PhysRevB_68_245409/report.md)（生成済みレポート例）
   - [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json)（devcontainer 設定）  
   - [.devcontainer/setup.sh](.devcontainer/setup.sh)（初期セットアップスクリプト）
 
