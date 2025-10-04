@@ -25,7 +25,7 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
 - github copilot agentと連携した際のシステムは以下のようになっております。
 - 現在はweb検索機能が不十分であります。将来的にはdeepresearchのような機能を追加して、より高度な解析を行えるようにする予定です。
 
-![]
+![システム概要図](./images/systemfig.jpg)
 
 # 使い方（簡易）
 
@@ -48,6 +48,7 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
         ```text
         $ \gamma = \dfrac{G(T,p,\{n_x\}) - \sum_x n_x \mu_x(T,p_x)}{A} $。
         ```
+        ➡️ &emsp; <img src="./images/equition.png" alt="数式" width="300" />
 
 # 参照
 - 実装ファイル:
