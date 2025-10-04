@@ -48,7 +48,6 @@ PaperInterpreter は、研究論文 PDF を自動で解析し、Markdown レポ�
         ```text
         $ \gamma = \dfrac{G(T,p,\{n_x\}) - \sum_x n_x \mu_x(T,p_x)}{A} $。
         ```
-        ➡️ &emsp; $ \gamma = \dfrac{G(T,p,\{n_x\}) - \sum_x n_x \mu_x(T,p_x)}{A} $
 
 # 参照
 - 実装ファイル:
