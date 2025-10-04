@@ -89,14 +89,14 @@ def MatSci_Interpreter_prompt(pdf_path: str) -> str:
 
 ### 作成順序
 1. 与えられたPDFファイルを読み込み、その内容をできる限り正確に理解する。
-2.  InterpreterMCP の pdf_to_markdown_tool を使用して、PDFファイルをMarkdown形式に変換し、テキストと画像を抽出する。
+2.  InterpreterMCP の PDF_to_Markdown_Converter を使用して、PDFファイルをMarkdown形式に変換し、テキストと画像を抽出する。
     - ただし、こちらで出力されるテキストの方には、数式や画像の情報が欠落している可能性が高いので、こちらは図などの画像だデータを取り出すための用途に留めること。
     - こちらのツールを実行すると、md_textとdest_dirが得られる。md_textは変換されたMarkdownの文字列、dest_dirは元のPDFを移動した先のディレクトリのパスである。
     - 抽出画像もdest_dir内のmaterialsというディレクトリに保存される。
 3. 1番の手順で理解した内容をもとに、学生の知識レベルに合わせた解説レポートを作成する。
     - レポート内で論文と同じ図を使用する場合は、pdf_to_markdown_toolで抽出した画像を適切な場所に挿入する。
     - 画像を挿入する際はreport.mdからの相対パスを指定しないと画像が表示されないので注意すること。
-    - レポートを作成する上で追加情報が必要であると判断した場合は、google_search_toolを使用して関連urlを収集し、それらのurlに fetch mcp や
+    - レポートを作成する上で追加情報が必要であると判断した場合は、Google_Search を使用して関連urlを収集し、それらのurlに fetch mcp や
     playwright mcpなどのツールを使って内容を取得し、レポートに反映させること。
 4. 内容の正確性と分かりやすさを確認し、必要に応じて修正を加える。
 5. レポートをreport.mdという名前のMarkdownファイルでdest_dir内に保存する。
